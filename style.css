@@ -5,6 +5,7 @@ body, html {
   overflow: hidden; /* Prevent scrollbars */
   background-color: #222; /* Dark background */
   font-family: sans-serif;
+  color: #eee; /* Lighter text color for dark background */
 }
 
 #videoElement {
@@ -17,22 +18,107 @@ body, html {
   display: none; /* Initially hidden */
 }
 
-#controls {
+/* Combined Overlay Menu Styling */
+#overlayMenu {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 15px 25px;
-  border-radius: 10px;
-  display: flex; /* Use flexbox for button layout */
-  gap: 15px; /* Space between buttons */
-  transition: opacity 0.3s ease, visibility 0.3s ease; /* Keep transition for potential future use */
+  background-color: rgba(0, 0, 0, 0.8); /* Slightly darker background */
+  padding: 15px 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column; /* Stack options above controls */
+  align-items: center; /* Center items horizontally */
+  gap: 15px; /* Space between options and controls */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Add shadow */
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Options Grid Layout */
+#displayMediaOptions {
+  width: 100%; /* Take full width of the overlay */
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* Ensure columns are truly equal */
+  gap: 10px 15px; /* Slightly increased row gap */
+  align-items: center;
+  width: 100%; /* Ensure grid takes full width */
+}
+
+/* Style individual option items (checkboxes) */
+.options-grid > div:not(.cursor-option-row) { /* Exclude cursor row */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Slightly increased gap */
+  justify-self: start; /* Align the entire div to the start of its grid cell */
+}
+
+/* Align checkboxes consistently */
+.options-grid input[type="checkbox"] {
+  cursor: pointer;
+  margin: 0; /* Reset default margins */
+  order: 1; /* Put checkbox before label */
+  flex-shrink: 0; /* Prevent checkbox from shrinking */
+}
+
+.options-grid label {
+  white-space: nowrap; /* Prevent labels from wrapping */
+  font-size: 14px;
+  order: 2; /* Put label after checkbox */
+}
+
+/* Style for the cursor dropdown row */
+.cursor-option-row {
+  grid-column: 1 / -1; /* Span across both columns */
+  display: flex;
+  justify-content: center; /* Center the cursor option */
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px; /* Increased space */
+  padding-top: 10px; /* Increased space */
+  border-top: 1px solid #444; /* Separator line above cursor */
+}
+
+.cursor-option-row label {
+  order: 1; /* Label first */
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.cursor-option-row select {
+  order: 2; /* Select second */
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background-color: #333;
+  color: #eee;
+  font-size: 13px;
+  cursor: pointer;
+  max-width: 100px; /* Prevent select from becoming too wide */
+}
+
+#controls {
+  display: flex;
+  gap: 15px;
+  width: 100%; /* Make controls take full width */
+  justify-content: center; /* Center buttons */
+  border-top: 1px solid #444; /* Separator line - default state */
+  padding-top: 15px; /* Space above buttons */
+  transition: border-top-color 0.3s ease, padding-top 0.3s ease; /* Add transition */
+}
+
+/* Hide separator line when capture is active */
+#overlayMenu.capture-active #controls {
+  border-top-color: transparent; /* Make border transparent */
+  padding-top: 0; /* Remove padding when border is hidden */
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 8px 16px;
+  font-size: 15px;
   cursor: pointer;
   border: none;
   border-radius: 5px;

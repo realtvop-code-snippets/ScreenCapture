@@ -1,21 +1,48 @@
 const videoElement = document.getElementById('videoElement');
 const startButton = document.getElementById('startButton');
-const pauseButton = document.getElementById('pauseButton'); // Added
-const resumeButton = document.getElementById('resumeButton'); // Added
+const pauseButton = document.getElementById('pauseButton');
+const resumeButton = document.getElementById('resumeButton');
 const stopButton = document.getElementById('stopButton');
 const controls = document.getElementById('controls');
+
+// Get references to the new option elements
+const videoOptionCheckbox = document.getElementById('videoOption');
+const cursorOptionSelect = document.getElementById('cursorOption');
+const audioOptionCheckbox = document.getElementById('audioOption');
+// Updated references for checkboxes
+const selfBrowserSurfaceCheckbox = document.getElementById('selfBrowserSurfaceOption');
+const systemAudioCheckbox = document.getElementById('systemAudioOption');
+const displayMediaOptionsDiv = document.getElementById('displayMediaOptions');
+const overlayMenuDiv = document.getElementById('overlayMenu'); // Reference to the main overlay
+const controlsDiv = document.getElementById('controls'); // Reference to controls div
+
 let mediaStream = null;
 let videoTrack = null; // Store the video track
 
 startButton.onclick = async () => {
-  try {
-    // Request permission to capture the screen
-    mediaStream = await navigator.mediaDevices.getDisplayMedia({
-      video: { cursor: "always" }, // Capture options (e.g., show cursor)
-      audio: false // You can request audio capture too if needed
-    });
+  // Construct the constraints object based on user selections
+  const displayMediaOptions = {
+    video: videoOptionCheckbox.checked ? { cursor: cursorOptionSelect.value } : false,
+    audio: audioOptionCheckbox.checked,
+    // Read checkbox state and map to 'include'/'exclude'
+    selfBrowserSurface: selfBrowserSurfaceCheckbox.checked ? 'include' : 'exclude',
+    systemAudio: systemAudioCheckbox.checked ? 'include' : 'exclude'
+  };
 
-    videoTrack = mediaStream.getVideoTracks()[0]; // Get the video track
+  // Basic validation: At least video or audio must be selected
+  if (!displayMediaOptions.video && !displayMediaOptions.audio) {
+    alert("You must select at least Video or Audio to capture.");
+    return;
+  }
+
+  console.log("Requesting display media with options:", displayMediaOptions);
+
+  try {
+    // Request permission to capture the screen with the specified options
+    mediaStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+
+    videoTrack = mediaStream.getVideoTracks()[0]; // Get the video track (if video was requested)
+    const audioTracks = mediaStream.getAudioTracks(); // Get audio tracks (if requested)
 
     // Display the stream in the video element
     videoElement.srcObject = mediaStream;
@@ -24,17 +51,25 @@ startButton.onclick = async () => {
     // Update button states
     startButton.disabled = true;
     stopButton.disabled = false;
-    pauseButton.disabled = false; // Enable Pause
+    pauseButton.disabled = !videoTrack;
     resumeButton.disabled = true;
-    resumeButton.style.display = 'none'; // Ensure Resume is hidden
-    pauseButton.style.display = 'inline-block'; // Ensure Pause is visible
+    resumeButton.style.display = 'none';
+    pauseButton.style.display = videoTrack ? 'inline-block' : 'none';
+    // Hide options and add class to overlay for styling
+    displayMediaOptionsDiv.style.display = 'none';
+    overlayMenuDiv.classList.add('capture-active'); // Add class
 
-    // Add event listener to stop capture when the stream ends (e.g., user clicks "Stop sharing")
-    videoTrack.addEventListener('ended', stopCapture);
+    // Add event listener to stop capture when the stream ends
+    if (videoTrack) {
+      videoTrack.addEventListener('ended', stopCapture);
+    } else if (audioTracks.length > 0) {
+      // If only audio, listen on the first audio track
+      audioTracks[0].addEventListener('ended', stopCapture);
+    }
 
   } catch (err) {
     console.error("Error starting screen capture:", err);
-    alert("Could not start screen capture. Please ensure you grant permission.");
+    alert("Could not start screen capture. Please ensure you grant permission and that the selected options are supported by your browser.");
     resetUI(); // Reset UI on error
   }
 };
@@ -85,6 +120,9 @@ function resetUI() {
     resumeButton.disabled = true;
     resumeButton.style.display = 'none'; // Hide Resume
     pauseButton.style.display = 'inline-block'; // Show Pause (but disabled)
+    // Show options and remove class from overlay
+    displayMediaOptionsDiv.style.display = 'grid'; // Use grid as it was before
+    overlayMenuDiv.classList.remove('capture-active'); // Remove class
 }
 
 // Initial UI state reset in case of page reload issues
