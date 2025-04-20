@@ -1,0 +1,75 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* Prevent scrollbars */
+  background-color: #222; /* Dark background */
+  font-family: sans-serif;
+}
+
+#videoElement {
+  position: fixed; /* Position relative to the viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Scale while preserving aspect ratio */
+  display: none; /* Initially hidden */
+}
+
+#controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px 25px;
+  border-radius: 10px;
+  display: flex; /* Use flexbox for button layout */
+  gap: 15px; /* Space between buttons */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Keep transition for potential future use */
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+#stopButton {
+    background-color: #f44336; /* Red */
+}
+
+#stopButton:hover:not(:disabled) {
+    background-color: #da190b;
+}
+
+#pauseButton {
+    background-color: #ff9800; /* Orange */
+}
+
+#pauseButton:hover:not(:disabled) {
+    background-color: #e68a00;
+}
+
+#resumeButton {
+    background-color: #2196F3; /* Blue */
+}
+
+#resumeButton:hover:not(:disabled) {
+    background-color: #0b7dda;
+}
